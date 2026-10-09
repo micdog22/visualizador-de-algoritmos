@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Visualizador de Algoritmos: ordenação e busca em grafos passo a passo</title>
+  <meta name="description" content="Veja bubble, insertion, merge, quick, heap, shell, counting e radix sort acontecendo, e BFS, DFS, Dijkstra, A* e busca bidirecional numa grade com paredes e lama.">
+  <meta name="theme-color" content="#c2410c">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
+  <link rel="stylesheet" href="./styles.css">
+  <script type="module" src="./src/app.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <h1>Visualizador de Algoritmos</h1>
+    <p class="lead">Ordenação e busca em grafos acontecendo passo a passo, com o pseudocódigo andando junto e contadores de cada operação.</p>
+  </header>
+
+  <main>
+    <div class="abas" role="tablist" aria-label="Escolha o tipo de algoritmo">
+      <button type="button" role="tab" id="aba-ordenacao" aria-controls="painel-ordenacao" aria-selected="true">Ordenação</button>
+      <button type="button" role="tab" id="aba-caminhos" aria-controls="painel-caminhos" aria-selected="false" tabindex="-1">Caminhos em grade</button>
+    </div>
+
+    <!-- ORDENAÇÃO -->
+    <section id="painel-ordenacao" role="tabpanel" aria-labelledby="aba-ordenacao">
+      <div class="card controles">
+        <div class="campo">
+          <label for="ord-algoritmo">Algoritmo</label>
+          <select id="ord-algoritmo"></select>
+        </div>
+        <div class="campo">
+          <label for="ord-preset">Entrada</label>
+          <select id="ord-preset"></select>
+        </div>
+        <div class="campo">
+          <label for="ord-tamanho">Tamanho: <output id="ord-tamanho-valor" for="ord-tamanho"></output></label>
+          <input type="range" id="ord-tamanho" min="8" max="200" step="1" value="48">
+        </div>
+        <div class="campo">
+          <label for="ord-velocidade">Velocidade: <output id="ord-velocidade-valor" for="ord-velocidade"></output></label>
+          <input type="range" id="ord-velocidade" min="0" max="100" step="1" value="45">
+        </div>
+        <div class="botoes">
+          <button type="button" class="btn" id="ord-play">Iniciar</button>
+          <button type="button" class="btn secundario" id="ord-passo">Um passo</button>
+          <button type="button" class="btn secundario" id="ord-novo">Novo vetor</button>
+          <button type="button" class="btn secundario" id="ord-comparar">Comparar todos</button>
+        </div>
+      </div>
+
+      <div class="layout">
+        <div class="card palco">
+          <canvas id="ord-tela" role="img" aria-label="Barras do vetor"></canvas>
+          <ul class="legenda" aria-label="Legenda das cores">
+            <li><span class="cor c-comparar"></span>comparando</li>
+            <li><span class="cor c-trocar"></span>trocando</li>
+            <li><span class="cor c-escrever"></span>escrevendo ou lendo</li>
+            <li><span class="cor c-pivo"></span>pivô ou menor</li>
+            <li><span class="cor c-ordenado"></span>no lugar final</li>
+          </ul>
+          <dl class="contadores" id="ord-contadores"></dl>
+          <p class="status" id="ord-status" role="status" aria-live="polite"></p>
+        </div>
+        <div class="card lateral">
+          <h2>Pseudocódigo</h2>
+          <ol class="pseudocodigo" id="ord-pseudo"></ol>
+          <h2>Complexidade</h2>
+          <dl class="complexidade" id="ord-complexidade"></dl>
+        </div>
+      </div>
+      <div class="card" id="ord-comparacao" hidden>
+        <h2>Todos os algoritmos no mesmo vetor</h2>
+        <div class="tabela-rolagem"><table id="ord-tabela"></table></div>
+      </div>
+    </section>
+
+    <!-- CAMINHOS -->
+    <section id="painel-caminhos" role="tabpanel" aria-labelledby="aba-caminhos" hidden>
+      <div class="card controles">
+        <div class="campo">
+          <label for="cam-algoritmo">Algoritmo</label>
+          <select id="cam-algoritmo"></select>
+        </div>
+        <div class="campo">
+          <label for="cam-heuristica">Heurística (A* e gulosa)</label>
+          <select id="cam-heuristica"></select>
+        </div>
+        <div class="campo">
+          <label for="cam-velocidade">Velocidade: <output id="cam-velocidade-valor" for="cam-velocidade"></output></label>
+          <input type="range" id="cam-velocidade" min="0" max="100" step="1" value="55">
+        </div>
+        <div class="campo">
+          <label for="cam-labirinto">Preencher a grade</label>
+          <div class="linha">
+            <select id="cam-labirinto"></select>
+            <button type="button" class="btn secundario" id="cam-gerar">Gerar</button>
+          </div>
+        </div>
+        <label class="check"><input type="checkbox" id="cam-diagonal"> Permitir diagonais</label>
+        <div class="botoes">
+          <button type="button" class="btn" id="cam-play">Iniciar</button>
+          <button type="button" class="btn secundario" id="cam-passo">Um passo</button>
+          <button type="button" class="btn secundario" id="cam-limpar-busca">Limpar busca</button>
+          <button type="button" class="btn secundario" id="cam-limpar">Limpar grade</button>
+          <button type="button" class="btn secundario" id="cam-comparar">Comparar todos</button>
+        </div>
+        <fieldset class="ferramentas">
+          <legend>Ao clicar e arrastar na grade</legend>
+          <label class="check"><input type="radio" name="ferramenta" value="parede" checked> Parede</label>
+          <label class="check"><input type="radio" name="ferramenta" value="lama"> Lama (custo 5)</label>
+          <label class="check"><input type="radio" name="ferramenta" value="apagar"> Apagar</label>
+          <span class="dica">Arraste o início ou o fim para movê-los.</span>
+        </fieldset>
+        <p class="aviso" id="cam-aviso" hidden></p>
+      </div>
+
+      <div class="layout">
+        <div class="card palco">
+          <canvas id="cam-tela" role="img" aria-label="Grade com paredes, lama, início e fim"></canvas>
+          <ul class="legenda" aria-label="Legenda das cores">
+            <li><span class="cor g-inicio"></span>início</li>
+            <li><span class="cor g-fim"></span>fim</li>
+            <li><span class="cor g-parede"></span>parede</li>
+            <li><span class="cor g-lama"></span>lama</li>
+            <li><span class="cor g-fronteira"></span>fronteira</li>
+            <li><span class="cor g-visitado"></span>visitado</li>
+            <li><span class="cor g-caminho"></span>caminho</li>
+          </ul>
+          <dl class="contadores" id="cam-contadores"></dl>
+          <p class="status" id="cam-status" role="status" aria-live="polite"></p>
+        </div>
+        <div class="card lateral">
+          <h2>Pseudocódigo</h2>
+          <ol class="pseudocodigo" id="cam-pseudo"></ol>
+          <p class="dica" id="cam-otimo"></p>
+        </div>
+      </div>
+      <div class="card" id="cam-comparacao" hidden>
+        <h2>Todos os algoritmos na mesma grade</h2>
+        <div class="tabela-rolagem"><table id="cam-tabela"></table></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>Tudo roda no seu navegador. <a href="https://github.com/micdog22/visualizador-de-algoritmos">Código aberto no GitHub</a> · Licença MIT</p>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,16 @@
+{
+  "name": "visualizador-de-algoritmos",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Ordenação e busca em grafos passo a passo: geradores JavaScript, pseudocódigo destacado e contadores de operações.",
+  "type": "module",
+  "scripts": {
+    "test": "node --test"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/micdog22/visualizador-de-algoritmos.git"
+  },
+  "homepage": "https://micdog22.github.io/visualizador-de-algoritmos/"
+}
